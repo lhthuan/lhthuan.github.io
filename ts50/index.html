@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vòng quay may mắn | Khai trương Trung Sơn Health & Beauty 25.11.2026</title>
+<meta name="theme-color" content="#d8eee4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Bảng màu & kiểu chữ lấy theo mypham.trungsoncare.com */
+  :root{--green:#07533c;--mint:#d8eee4;--mint-d:#a9cdb9;--cream:#f4f1eb;--ink:#2a2a2a;--grey:#8a8f8c;
+    --coral:#ff8a73;--red:#da291c;--amber:#f5a524;--line:#e2e8e4}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%}
+  body{font-family:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;color:var(--ink);background:#fff;
+    font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+  .strip{background:var(--mint-d);text-align:center;font-size:13px;font-weight:500;padding:7px 12px}
+  .strip b{font-weight:600;text-decoration:underline;text-underline-offset:3px}
+  header{background:var(--mint);padding:14px 16px;display:flex;justify-content:center}
+  header img{height:54px;width:auto;display:block}
+  .app{width:100%;max-width:480px;margin:0 auto;padding:0 16px 36px}
+
+  .hero{margin-top:16px;border-radius:8px;overflow:hidden;background:var(--green);color:#fff;text-align:center;padding:20px 16px 0}
+  .hero small{display:block;font-size:13px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--mint)}
+  .hero h1{margin:4px 0 10px;font-size:clamp(20px,6.2vw,26px);white-space:nowrap;line-height:1.25;font-weight:700}
+  .badge{display:inline-block;background:var(--coral);color:var(--ink);border-radius:6px;padding:4px 12px;font-weight:600;font-size:15px}
+  .hero img{display:block;width:82%;margin:6px auto -6px;mix-blend-mode:lighten}
+
+  .title{text-align:center;margin:28px 0 0}
+  .title h2{margin:0;font-size:24px;font-weight:600;line-height:1.3}
+  .title p{margin:4px 0 0;color:var(--grey);font-size:15px}
+  .demo{display:none;margin:10px auto 0;width:fit-content;background:#fff6e0;color:#7a5600;border-radius:6px;padding:4px 10px;font-size:12px}
+
+  .wheel-wrap{position:relative;width:min(100%,400px);aspect-ratio:1;margin:34px auto 24px}
+  #wheel{width:100%;height:100%;border-radius:50%;display:block;border:8px solid var(--green);background:#fff;
+    transition:transform 6s cubic-bezier(.12,.6,.1,1)}
+  .pointer{position:absolute;top:-20px;left:50%;transform:translateX(-50%);z-index:3;width:40px;height:48px}
+  .hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;width:20%;aspect-ratio:1;border-radius:50%;
+    background:#fff;border:4px solid var(--green);color:var(--green);font-weight:700;font-size:clamp(13px,3.8vw,16px);
+    display:flex;align-items:center;justify-content:center}
+
+  .panel{background:var(--mint);border-radius:8px;padding:20px 16px}
+  label{display:block;font-size:14px;font-weight:600;margin:0 0 6px}
+  input[type=text],input[type=tel]{width:100%;font:inherit;font-size:16px;padding:13px 20px;border:1px solid transparent;border-radius:999px;
+    background:#fff;color:var(--ink);outline:none;margin-bottom:14px}
+  input::placeholder{color:#9aa39e}
+  input:focus{border-color:var(--green)}
+  .btn{width:100%;border:1px solid var(--green);border-radius:6px;padding:14px;font:inherit;font-size:17px;font-weight:600;color:#fff;
+    background:var(--green);cursor:pointer}
+  .btn:active{background:#053f2e}
+  .btn[disabled]{opacity:.6;cursor:default}
+  .btn.ghost{background:#fff;color:var(--green)}
+  .err{color:var(--red);font-size:14px;min-height:20px;margin:-4px 0 8px;font-weight:500}
+  .note{font-size:13px;color:#56605b;text-align:center;margin:12px 0 0}
+  .link{display:block;margin:8px auto 0;background:none;border:0;color:var(--green);font:inherit;font-weight:600;font-size:14px;
+    text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+
+  .rules{margin-top:32px}
+  .rules h2{margin:0 0 14px;font-size:22px;font-weight:600;text-align:center}
+  .steps{list-style:none;margin:0;padding:0;counter-reset:s}
+  .steps li{counter-increment:s;display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .steps li::before{content:counter(s);font-size:34px;font-weight:700;line-height:1;min-width:24px}
+  .info{display:grid;gap:10px;margin-top:16px}
+  .tile{background:var(--cream);border-radius:8px;padding:12px 14px;font-size:14px}
+  .tile b{display:block;font-size:13px;font-weight:600;color:var(--green);margin-bottom:2px}
+  .tile strong{color:var(--red);font-weight:600}
+  footer{margin-top:28px;text-align:center;font-size:13px;color:var(--grey)}
+
+  .modal{position:fixed;inset:0;background:rgba(20,30,25,.6);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
+  .modal.on{display:flex}
+  .box{background:#fff;border-radius:12px;padding:22px 18px 18px;max-width:400px;width:100%;max-height:94vh;overflow:auto;text-align:center;
+    animation:pop .35s cubic-bezier(.2,1.2,.4,1)}
+  @keyframes pop{from{transform:translateY(16px);opacity:0}}
+  .box h2{margin:0;font-size:24px;font-weight:700;color:var(--green)}
+  .box p{margin:4px 0}
+  .lead{color:var(--grey);font-size:15px}
+  .prize{background:var(--cream);border-radius:8px;padding:12px;margin:12px 0 10px}
+  .prize img{width:70%;max-width:250px;display:block;margin:0 auto}
+  .pname{font-size:19px;font-weight:600}
+  .code-l{font-size:12px;color:var(--grey);margin-top:10px!important;text-transform:uppercase;letter-spacing:.08em}
+  .code{display:inline-block;margin:2px 0 12px;padding:8px 20px;border:1.5px dashed var(--green);border-radius:6px;
+    font-size:24px;font-weight:700;letter-spacing:.12em;color:var(--green)}
+  .invite{background:var(--mint);border-radius:8px;padding:12px;font-size:14px;line-height:1.55;text-align:left}
+  .invite b{font-weight:600}
+  .vc{background:var(--cream);border-radius:8px;padding:10px 12px;font-size:13px;text-align:left;margin-top:8px!important}
+  .small{font-size:13px;color:var(--grey);margin:10px 0 12px!important}
+  #confetti{position:fixed;inset:0;pointer-events:none;z-index:11}
+</style>
+</head>
+<body>
+<div class="strip">Khai trương <b>25.11.2026</b> · Ninh Kiều, Cần Thơ</div>
+<header><img src="assets/logo-ts.webp" alt="Trung Sơn Beauty Pharmacy"></header>
+
+<div class="app">
+  <section class="hero">
+    <small>Mừng khai trương</small>
+    <h1>Trung Sơn Health &amp; Beauty</h1>
+    <span class="badge">25.11.2026</span>
+    <img src="assets/store.webp" alt="Cửa hàng Trung Sơn Health &amp; Beauty">
+  </section>
+
+  <div class="title">
+    <h2>Vòng quay may mắn</h2>
+    <p>Đăng ký thành viên – quay là có quà</p>
+  </div>
+  <div class="demo" id="demo">Chế độ thử – dữ liệu chỉ lưu trên máy này</div>
+
+  <div class="wheel-wrap">
+    <svg class="pointer" viewBox="0 0 40 48"><path d="M20 48 3 17a18.5 18.5 0 1 1 34 0z" fill="#ff8a73" stroke="#fff" stroke-width="3"/><circle cx="20" cy="16" r="6" fill="#fff"/></svg>
+    <canvas id="wheel" width="1000" height="1000"></canvas>
+    <div class="hub">QUAY</div>
+  </div>
+
+  <form class="panel" id="form" novalidate>
+    <label for="name">Họ và tên</label>
+    <input type="text" id="name" autocomplete="name" maxlength="60" placeholder="Nguyễn Thị A">
+    <label for="phone">Số điện thoại</label>
+    <input type="tel" id="phone" inputmode="numeric" autocomplete="tel" maxlength="20" placeholder="09xx xxx xxx">
+    <div class="err" id="err"></div>
+    <button class="btn" id="spin" type="submit">Quay ngay</button>
+    <p class="note">Mỗi số điện thoại được quay 1 lần.</p>
+    <button class="link" id="mine" type="button" hidden>Xem lại quà của tôi</button>
+  </form>
+
+  <section class="rules">
+    <h2>Thể lệ chương trình</h2>
+    <ol class="steps">
+      <li>Quét mã QR, điền họ tên và số điện thoại để đăng ký thành viên Trung Sơn.</li>
+      <li>Quay vòng quay và lưu lại mã quà tặng.</li>
+      <li>Đưa mã quà tặng cho nhân viên để nhận quà miễn phí tại địa chỉ và thời gian bên dưới.</li>
+    </ol>
+    <div class="info">
+      <div class="tile"><b>Địa chỉ nhận quà</b>Trung Sơn Health &amp; Beauty – 47B Đ. 3 Tháng 2, Phường Xuân Khánh, Ninh Kiều, Cần Thơ</div>
+      <div class="tile"><b>Thời gian nhận quà</b>25 – 30/11/2026</div>
+      <div class="tile"><b>Điều kiện voucher</b>Áp dụng từ <strong>25/11 – 31/12/2026</strong> cho hoá đơn từ <strong>499.000 đồng</strong> trở lên (trong đó từ <strong>99.000 đồng</strong> là mỹ phẩm).</div>
+    </div>
+  </section>
+  <footer>Trung Sơn Beauty Pharmacy</footer>
+</div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <h2 id="mTitle">Chúc mừng bạn!</h2>
+    <p class="lead" id="mLead">Bạn đã nhận được</p>
+    <div class="prize"><img id="mImg" alt=""></div>
+    <p class="pname" id="mPrize"></p>
+    <p class="code-l">Mã quà tặng</p>
+    <div class="code" id="mCode"></div>
+    <div class="invite">Mời bạn đến dự khai trương <b>Trung Sơn Health &amp; Beauty</b> ngày <b>25/11/2026</b> để nhận quà.<br>
+      Địa chỉ: 47B Đ. 3 Tháng 2, P. Xuân Khánh, Ninh Kiều, Cần Thơ<br>Nhận quà: <b>25 – 30/11/2026</b></div>
+    <p class="vc" id="mVc">Voucher áp dụng 25/11 – 31/12/2026 cho hoá đơn từ 499.000đ (trong đó từ 99.000đ là mỹ phẩm).</p>
+    <p class="small" id="mInfo"></p>
+    <p class="small">Chụp màn hình lưu mã quà tặng và đưa cho nhân viên khi đến nhận quà.</p>
+    <button class="btn" id="next" type="button">Đã lưu mã</button>
+  </div>
+</div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ================== CẤU HÌNH ================== */
+// Dán URL Web App của Google Apps Script vào đây (xem HUONG-DAN.md).
+// Để trống = chế độ thử: bốc thăm và lưu ngay trên trình duyệt của máy này.
+const API_URL = "https://script.google.com/macros/s/AKfycbwj_iuvmZVk7k1htrDW9kOmqoQUKUiCiX-UN5dt15s95muL5QCL_NEF-YDXd4fM7Suc/exec";
+
+// Thứ tự hiển thị trên vòng quay. weight/stock chỉ dùng cho chế độ thử;
+// khi đã nối Google Sheet thì tỷ lệ & tồn kho lấy từ sheet "Prizes".
+const PRIZES = [
+  {id:1, name:"Voucher Nucos 50K",             weight:400, stock:8000},
+  {id:4, name:"Dây buộc tóc",                  weight:750, stock:750},
+  {id:2, name:"Voucher Nucos 100K",            weight:200, stock:4000},
+  {id:5, name:"Túi vải Trung Sơn",             weight:500, stock:500},
+  {id:3, name:"Voucher Trung Sơn 50K",         weight:600, stock:12000},
+  {id:6, name:"Mỹ phẩm mini ngẫu nhiên",       weight:500, stock:500},
+  {id:7, name:"Voucher online Trung Sơn 50K",  weight:500, stock:6250},
+  {id:8, name:"Voucher online Trung Sơn 100K", weight:500, stock:6250},
+];
+/* ============================================== */
+
+const $ = id => document.getElementById(id);
+const N = PRIZES.length, SEG = 360 / N;
+const canvas = $("wheel"), ctx = canvas.getContext("2d");
+let rotation = 0, busy = false;
+
+/* ---------- Vẽ vòng quay ---------- */
+function loadImg(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src;});}
+async function drawWheel(){
+  const imgs = await Promise.all(PRIZES.map(p=>loadImg(`assets/p${p.id}.webp`)));
+  const R = 500, a = 2*Math.PI/N;
+  ctx.clearRect(0,0,1000,1000);
+  ctx.save(); ctx.translate(R,R);
+  for(let i=0;i<N;i++){
+    // lát i có tâm tại góc i*SEG tính từ đỉnh, theo chiều kim đồng hồ
+    const start = -Math.PI/2 + i*a - a/2;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,R,start,start+a); ctx.closePath();
+    ctx.fillStyle = i%2 ? "#ffffff" : "#d8eee4"; ctx.fill();
+    ctx.save(); ctx.rotate(i*a);
+    const im = imgs[i];
+    if(im){ const w=236, h=w*im.height/im.width; ctx.drawImage(im,-w/2,-R+46,w,h); }
+    else{ ctx.fillStyle="#07533c"; ctx.font="600 30px 'Be Vietnam Pro',sans-serif"; ctx.textAlign="center"; ctx.fillText(PRIZES[i].name,0,-R+120,240); }
+    ctx.restore();
+  }
+  // đường chia lát
+  ctx.strokeStyle = "#07533c"; ctx.lineWidth = 3;
+  for(let i=0;i<N;i++){ const t=-Math.PI/2 + i*a - a/2; ctx.beginPath(); ctx.moveTo(0,0); ctx.lineTo(Math.cos(t)*R,Math.sin(t)*R); ctx.stroke(); }
+  ctx.restore();
+}
+drawWheel();
+
+function spinTo(prizeId){
+  const i = PRIZES.findIndex(p=>p.id==prizeId);
+  const jitter = (Math.random()-.5)*SEG*.6;
+  const target = (360 - i*SEG + jitter + 360) % 360;
+  rotation = Math.ceil(rotation/360)*360 + 360*6 + target;
+  canvas.style.transform = `rotate(${rotation}deg)`;
+  return new Promise(r=>setTimeout(r,6300));
+}
+
+/* ---------- Chuẩn hoá & kiểm tra ---------- */
+function normPhone(v){
+  let d = v.replace(/\D/g,"");
+  if(d.startsWith("84") && d.length===11) d = "0"+d.slice(2);
+  return /^0[35789]\d{8}$/.test(d) ? d : null;
+}
+
+/* ---------- Backend ---------- */
+const DEMO = !API_URL || new URLSearchParams(location.search).has("demo"); // thêm ?demo vào link để thử giao diện, không ghi vào Sheet
+async function play(name, phone){
+  if(!DEMO){
+    const res = await fetch(API_URL,{method:"POST",body:JSON.stringify({name,phone})}); // text/plain => không preflight CORS
+    return res.json();
+  }
+  return playLocal(name, phone);
+}
+// Chế độ thử: cùng logic với Apps Script nhưng lưu localStorage
+function playLocal(name, phone){
+  const db = JSON.parse(localStorage.getItem("ts_lucky")||"[]");
+  const old = db.find(r=>r.phone===phone);
+  if(old) return {status:"played", prizeId:old.prizeId, prize:old.prize, code:old.code, time:old.time};
+  const pool = PRIZES.map(p=>({...p, left:p.stock - db.filter(r=>r.prizeId===p.id).length})).filter(p=>p.left>0 && p.weight>0);
+  if(!pool.length) return {status:"soldout"};
+  let x = Math.random()*pool.reduce((s,p)=>s+p.weight,0), win = pool[0];
+  for(const p of pool){ if((x-=p.weight)<0){win=p;break;} }
+  const code = "TS"+Math.random().toString(36).slice(2,8).toUpperCase();
+  const rec = {time:new Date().toLocaleString("vi-VN"), name, phone, prizeId:win.id, prize:win.name, code};
+  db.push(rec); localStorage.setItem("ts_lucky",JSON.stringify(db));
+  return {status:"ok", ...rec};
+}
+// Chế độ thử: gõ exportCSV() trong Console để tải danh sách
+window.exportCSV = function(){
+  const db = JSON.parse(localStorage.getItem("ts_lucky")||"[]");
+  const csv = "﻿Thời gian,Họ tên,SĐT,Mã quà,Quà,Mã nhận thưởng\n"+db.map(r=>[r.time,r.name,"'"+r.phone,r.prizeId,r.prize,r.code].map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"})); a.download="lucky-wheel.csv"; a.click();
+};
+
+/* ---------- Luồng chính ---------- */
+if(DEMO) $("demo").style.display="block";
+
+$("form").addEventListener("submit", async e=>{
+  e.preventDefault(); if(busy) return;
+  const name = $("name").value.trim().replace(/\s+/g," "), phone = normPhone($("phone").value);
+  const err = m=>{$("err").textContent=m;};
+  if(name.length<2) return err("Vui lòng nhập họ và tên.");
+  if(!phone) return err("Số điện thoại chưa đúng (10 số, bắt đầu bằng 0).");
+  err(""); busy = true; $("spin").disabled = true; $("spin").textContent = "Đang quay…";
+  try{
+    const r = await play(name, phone);
+    if(r.status==="ok"){ document.activeElement.blur(); canvas.scrollIntoView({behavior:"smooth",block:"center"}); await spinTo(r.prizeId); showResult(r,false); confetti(); }
+    else if(r.status==="played"){ showResult(r,true); }
+    else if(r.status==="soldout"){ err("Chương trình đã hết quà. Cảm ơn bạn đã quan tâm!"); }
+    else err(r.message||"Có lỗi xảy ra, vui lòng thử lại.");
+  }catch(ex){ err("Mất kết nối, vui lòng thử lại."); }
+  busy = false; $("spin").disabled = false; $("spin").textContent = "Quay ngay";
+});
+
+function showResult(r, played){
+  $("mTitle").textContent = played ? "Quà của bạn" : "Chúc mừng bạn!";
+  $("mLead").textContent  = played ? "Số điện thoại này đã quay và nhận được" : "Bạn đã nhận được";
+  $("mVc").style.display = /voucher/i.test(r.prize) ? "" : "none";
+  try{ localStorage.setItem("ts_lucky_me", JSON.stringify(r)); }catch(e){}
+  $("mine").hidden = false;
+  $("mImg").src = `assets/p${r.prizeId}.webp`;
+  $("mPrize").textContent = r.prize;
+  $("mCode").textContent = r.code;
+  $("mInfo").textContent = (played && r.time) ? "Thời gian quay: "+r.time : "";
+  $("modal").classList.add("on");
+}
+$("next").addEventListener("click", ()=>{ $("modal").classList.remove("on"); });
+// Khách mở lại trang trên cùng điện thoại: hiện lại quà đã quay
+function myGift(){ try{ return JSON.parse(localStorage.getItem("ts_lucky_me")); }catch(e){ return null; } }
+$("mine").addEventListener("click", ()=>{ const r=myGift(); if(r) showResult(r,true); });
+if(myGift()){ $("mine").hidden=false; showResult(myGift(),true); }
+
+/* ---------- Pháo giấy ---------- */
+function confetti(){
+  const c=$("confetti"), x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+  const cols=["#07533c","#ff8a73","#f5a524","#a9cdb9","#da291c"];
+  const ps=Array.from({length:140},()=>({x:Math.random()*c.width,y:-20-Math.random()*c.height*.5,v:2+Math.random()*4,
+    s:5+Math.random()*7,c:cols[Math.random()*5|0],r:Math.random()*6,d:(Math.random()-.5)*2}));
+  let t=0;(function f(){ x.clearRect(0,0,c.width,c.height);
+    ps.forEach(p=>{p.y+=p.v;p.x+=p.d;p.r+=.1;x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;x.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);x.restore();});
+    if(++t<220) requestAnimationFrame(f); else x.clearRect(0,0,c.width,c.height); })();
+}
+</script>
+</body>
+</html>
