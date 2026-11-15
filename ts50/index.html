@@ -34,8 +34,7 @@
   .demo{display:none;margin:10px auto 0;width:fit-content;background:#fff6e0;color:#7a5600;border-radius:6px;padding:4px 10px;font-size:12px}
 
   .wheel-wrap{position:relative;width:min(100%,400px);aspect-ratio:1;margin:34px auto 24px}
-  #wheel{width:100%;height:100%;border-radius:50%;display:block;border:8px solid var(--green);background:#fff;
-    transition:transform 6s cubic-bezier(.12,.6,.1,1)}
+  #wheel{width:100%;height:100%;border-radius:50%;display:block;border:8px solid var(--green);background:#fff;will-change:transform}
   .pointer{position:absolute;top:-20px;left:50%;transform:translateX(-50%);z-index:3;width:40px;height:48px}
   .hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;width:20%;aspect-ratio:1;border-radius:50%;
     background:#fff;border:4px solid var(--green);color:var(--green);font-weight:700;font-size:clamp(13px,3.8vw,16px);
@@ -220,18 +219,6 @@ function tone(freq, t, dur, type, vol){
   o.connect(g).connect(AC.destination); o.start(t); o.stop(t+dur+0.02);
 }
 function tick(){ ticks++; if(!AC) return; const t = AC.currentTime; tone(1500, t, 0.05, "triangle", 0.25); tone(320, t, 0.04, "square", 0.08); }
-// Kêu "tách" mỗi lần một vạch chia đi qua kim, nên tiếng chậm dần đúng theo vòng quay
-function tickLoop(until){
-  let last = null;
-  (function f(){
-    const m = new DOMMatrix(getComputedStyle(canvas).transform);
-    const ang = (Math.atan2(m.b, m.a)*180/Math.PI + 360) % 360;
-    const seg = Math.floor(((ang + SEG/2) % 360) / SEG);
-    if(last !== null && seg !== last) tick();
-    last = seg;
-    if(performance.now() < until) requestAnimationFrame(f);
-  })();
-}
 function winSound(){
   if(!AC) return; const t = AC.currentTime + 0.05;
   // kèn chúc mừng
@@ -254,14 +241,42 @@ function winSound(){
   });
 }
 
-function spinTo(prizeId){
-  const i = PRIZES.findIndex(p=>p.id==prizeId);
-  const jitter = (Math.random()-.5)*SEG*.6;
-  const target = (360 - i*SEG + jitter + 360) % 360;
-  rotation = Math.ceil(rotation/360)*360 + 360*6 + target;
-  canvas.style.transform = `rotate(${rotation}deg)`;
-  tickLoop(performance.now() + 6100);
-  return new Promise(r=>setTimeout(r,6300));
+// Quay ngay khi bấm (tăng tốc → quay đều trong lúc chờ máy chủ trả quà → chậm dần và dừng đúng ô quà).
+// Mỗi lần một vạch chia đi qua kim thì kêu "tách", nên tiếng chậm dần theo vòng quay.
+function spinWheel(resultPromise){
+  const VMAX = 760, ACC = 0.7, MIN_CRUISE = 1.2, P = 3; // độ/giây, giây, giây, độ "lì" khi hãm
+  return new Promise(resolve=>{
+    let res = null, dec = null, lastSeg = null, tPrev = performance.now();
+    const tStart = tPrev;
+    resultPromise.then(r=>{ res = r; }, ()=>{ res = {status:"neterr"}; });
+    (function frame(now){
+      const dt = Math.min(0.05, Math.max(0, (now - tPrev)/1000)); tPrev = now;
+      const el = (now - tStart)/1000;
+      if(!dec){
+        rotation += VMAX * Math.min(1, el/ACC) * dt;
+        if(res && el >= ACC + MIN_CRUISE){
+          if(res.status === "ok"){
+            const i = PRIZES.findIndex(p=>p.id==res.prizeId);
+            const target = (360 - i*SEG + (Math.random()-.5)*SEG*.6 + 360) % 360;
+            const base = VMAX*6/P;                                   // hãm tối thiểu ~6 giây
+            const D = base + (((target - (rotation + base)) % 360) + 360) % 360;
+            dec = {r0:rotation, D, T:D*P/VMAX, t0:now};
+          }else{                                                     // đã quay rồi / lỗi: dừng nhanh
+            dec = {r0:rotation, D:VMAX*1.2/P, T:1.2, t0:now};
+          }
+        }
+      }else{
+        const u = Math.min(1, (now - dec.t0)/1000/dec.T);
+        rotation = dec.r0 + dec.D*(1 - Math.pow(1-u, P));
+        if(u >= 1){ canvas.style.transform = `rotate(${rotation}deg)`; return resolve(res); }
+      }
+      canvas.style.transform = `rotate(${rotation}deg)`;
+      const seg = Math.floor((((rotation % 360) + SEG/2) % 360) / SEG);
+      if(lastSeg !== null && seg !== lastSeg) tick();
+      lastSeg = seg;
+      requestAnimationFrame(frame);
+    })(performance.now());
+  });
 }
 
 /* ---------- Chuẩn hoá & kiểm tra ---------- */
@@ -312,13 +327,15 @@ $("form").addEventListener("submit", async e=>{
   if(!phone) return err("Số điện thoại chưa đúng (10 số, bắt đầu bằng 0).");
   audioOn();
   err(""); busy = true; $("spin").disabled = true; $("spin").textContent = "Đang quay…";
-  try{
-    const r = await play(name, phone);
-    if(r.status==="ok"){ document.activeElement.blur(); canvas.scrollIntoView({behavior:"smooth",block:"center"}); await spinTo(r.prizeId); showResult(r,false); confetti(); winSound(); }
-    else if(r.status==="played"){ showResult(r,true); }
-    else if(r.status==="soldout"){ err("Chương trình đã hết quà. Cảm ơn bạn đã quan tâm!"); }
-    else err(r.message||"Có lỗi xảy ra, vui lòng thử lại.");
-  }catch(ex){ err("Mất kết nối, vui lòng thử lại."); }
+  document.activeElement.blur();
+  canvas.scrollIntoView({behavior:"smooth", block:"center"});     // về vòng quay ngay, không chờ máy chủ
+  const r = await spinWheel(play(name, phone));
+  if(r.status==="ok"){ showResult(r,false); confetti(); winSound(); }
+  else if(r.status==="played"){ showResult(r,true); }
+  else if(r.status==="soldout"){ err("Chương trình đã hết quà. Cảm ơn bạn đã quan tâm!"); }
+  else if(r.status==="neterr"){ err("Mất kết nối, vui lòng thử lại."); }
+  else err(r.message||"Có lỗi xảy ra, vui lòng thử lại.");
+  if(r.status!=="ok" && r.status!=="played") $("form").scrollIntoView({behavior:"smooth", block:"center"});
   busy = false; $("spin").disabled = false; $("spin").textContent = "Quay ngay";
 });
 
