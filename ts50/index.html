@@ -219,26 +219,25 @@ function tone(freq, t, dur, type, vol){
   o.connect(g).connect(AC.destination); o.start(t); o.stop(t+dur+0.02);
 }
 function tick(){ ticks++; if(!AC) return; const t = AC.currentTime; tone(1500, t, 0.05, "triangle", 0.25); tone(320, t, 0.04, "square", 0.08); }
+// Nhạc thắng giải: "tà-ta-ta-TAAA" đi lên, kết bằng hợp âm trưởng sáng và tiếng lấp lánh. Không có nốt nào đi xuống.
+function brass(freq, t, dur, vol){
+  const o = AC.createOscillator(), o2 = AC.createOscillator(), lp = AC.createBiquadFilter(), g = AC.createGain();
+  o.type = "sawtooth"; o2.type = "square"; o.frequency.value = freq; o2.frequency.value = freq; o2.detune.value = 7;
+  lp.type = "lowpass"; lp.frequency.setValueAtTime(900, t); lp.frequency.linearRampToValueAtTime(3200, t+0.05);
+  g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(vol, t+0.02);
+  g.gain.setValueAtTime(vol, t+Math.max(0.03, dur-0.08)); g.gain.linearRampToValueAtTime(0.0001, t+dur);
+  o.connect(lp); o2.connect(lp); lp.connect(g).connect(AC.destination);
+  o.start(t); o2.start(t); o.stop(t+dur+0.02); o2.stop(t+dur+0.02);
+}
 function winSound(){
   if(!AC) return; const t = AC.currentTime + 0.05;
-  // kèn chúc mừng
-  [523.25, 659.25, 783.99, 1046.5].forEach((f,i)=>tone(f, t+i*0.11, 0.22, "triangle", 0.22));
-  [523.25, 659.25, 783.99, 1046.5].forEach(f=>tone(f, t+0.46, 0.9, "triangle", 0.13));
-  // tiếng "wao": giọng tổng hợp, lướt nguyên âm u → a → o
-  const t0 = t + 0.5, out = AC.createGain();
-  out.gain.setValueAtTime(0.0001, t0); out.gain.exponentialRampToValueAtTime(0.5, t0+0.12);
-  out.gain.setValueAtTime(0.5, t0+0.6); out.gain.exponentialRampToValueAtTime(0.0001, t0+1.1);
-  out.connect(AC.destination);
-  const f1 = AC.createBiquadFilter(), f2 = AC.createBiquadFilter();
-  f1.type = f2.type = "bandpass"; f1.Q.value = 5; f2.Q.value = 7;
-  f1.frequency.setValueAtTime(330, t0); f1.frequency.linearRampToValueAtTime(900, t0+0.35); f1.frequency.linearRampToValueAtTime(480, t0+1.0);
-  f2.frequency.setValueAtTime(850, t0); f2.frequency.linearRampToValueAtTime(1350, t0+0.35); f2.frequency.linearRampToValueAtTime(820, t0+1.0);
-  f1.connect(out); f2.connect(out);
-  [196, 247, 294, 392].forEach((f,i)=>{ // vài giọng chồng lên nhau cho giống nhiều người
-    const o = AC.createOscillator(); o.type = "sawtooth";
-    o.frequency.setValueAtTime(f*0.9, t0); o.frequency.linearRampToValueAtTime(f*1.12, t0+0.35); o.frequency.linearRampToValueAtTime(f*0.95, t0+1.0);
-    o.detune.value = (i-1.5)*9; o.connect(f1); o.connect(f2); o.start(t0); o.stop(t0+1.15);
-  });
+  const C5=523.25, E5=659.25, G5=783.99, C6=1046.5, E6=1318.5, G6=1568, C7=2093;
+  brass(C5, t,      0.11, 0.16);
+  brass(E5, t+0.12, 0.11, 0.16);
+  brass(G5, t+0.24, 0.11, 0.16);
+  [C5, E5, G5, C6].forEach(f=>brass(f, t+0.38, 0.85, 0.11));            // hợp âm kết, ngân dài
+  brass(C6*2, t+0.38, 0.85, 0.04);
+  [C6, E6, G6, C7, E6*2, G6*2].forEach((f,i)=>tone(f, t+0.5+i*0.07, 0.35, "sine", 0.12)); // lấp lánh đi lên
 }
 
 // Quay ngay khi bấm (tăng tốc → quay đều trong lúc chờ máy chủ trả quà → chậm dần và dừng đúng ô quà).
