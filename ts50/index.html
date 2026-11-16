@@ -65,6 +65,9 @@
   .tile{background:var(--cream);border-radius:8px;padding:12px 14px;font-size:14px}
   .tile b{display:block;font-size:13px;font-weight:600;color:var(--green);margin-bottom:2px}
   .tile strong{color:var(--red);font-weight:600}
+  .a{color:var(--green);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+  .tile .a{display:block;margin-top:4px}
+  .tile .a.tel{font-size:18px;margin-top:0}
   footer{margin-top:28px;text-align:center;font-size:13px;color:var(--grey)}
 
   .modal{position:fixed;inset:0;background:rgba(20,30,25,.6);display:none;align-items:center;justify-content:center;z-index:10;padding:16px}
@@ -131,12 +134,14 @@
       <li>Đưa mã quà tặng cho nhân viên để nhận quà miễn phí tại địa chỉ và thời gian bên dưới.</li>
     </ol>
     <div class="info">
-      <div class="tile"><b>Địa chỉ nhận quà</b>Trung Sơn Health &amp; Beauty – 47B Đ. 3 Tháng 2, Phường Xuân Khánh, Ninh Kiều, Cần Thơ</div>
+      <div class="tile"><b>Địa chỉ nhận quà</b>Trung Sơn Health &amp; Beauty – 47B Đ. 3 Tháng 2, Phường Xuân Khánh, Ninh Kiều, Cần Thơ
+        <a class="a" href="https://maps.app.goo.gl/rvAMbxTTvvsf4JFG6" target="_blank" rel="noopener">Xem trên Google Maps</a></div>
       <div class="tile"><b>Thời gian nhận quà</b>25 – 30/11/2026</div>
+      <div class="tile"><b>Hotline liên hệ</b><a class="a tel" href="tel:1800558898">1800 55 88 98</a></div>
       <div class="tile"><b>Điều kiện voucher</b>Áp dụng từ <strong>25/11 – 31/12/2026</strong> cho hoá đơn từ <strong>499.000 đồng</strong> trở lên (trong đó từ <strong>99.000 đồng</strong> là mỹ phẩm).</div>
     </div>
   </section>
-  <footer>Trung Sơn Beauty Pharmacy</footer>
+  <footer>Trung Sơn Beauty Pharmacy · Hotline <a class="a" href="tel:1800558898">1800 55 88 98</a></footer>
 </div>
 
 <div class="modal" id="modal">
@@ -148,7 +153,8 @@
     <p class="code-l">Mã quà tặng</p>
     <div class="code" id="mCode"></div>
     <div class="invite">Mời bạn đến dự khai trương <b>Trung Sơn Health &amp; Beauty</b> ngày <b>25/11/2026</b> để nhận quà.<br>
-      Địa chỉ: 47B Đ. 3 Tháng 2, P. Xuân Khánh, Ninh Kiều, Cần Thơ<br>Nhận quà: <b>25 – 30/11/2026</b></div>
+      Địa chỉ: 47B Đ. 3 Tháng 2, P. Xuân Khánh, Ninh Kiều, Cần Thơ · <a class="a" href="https://maps.app.goo.gl/rvAMbxTTvvsf4JFG6" target="_blank" rel="noopener">Xem bản đồ</a><br>
+      Nhận quà: <b>25 – 30/11/2026</b><br>Hotline: <a class="a" href="tel:1800558898">1800 55 88 98</a></div>
     <p class="vc" id="mVc">Voucher áp dụng 25/11 – 31/12/2026 cho hoá đơn từ 499.000đ (trong đó từ 99.000đ là mỹ phẩm).</p>
     <p class="small" id="mInfo"></p>
     <p class="small">Chụp màn hình lưu mã quà tặng và đưa cho nhân viên khi đến nhận quà.</p>
