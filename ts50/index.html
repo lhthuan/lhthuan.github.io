@@ -53,6 +53,8 @@
   .btn.ghost{background:#fff;color:var(--green)}
   .err{color:var(--red);font-size:14px;min-height:20px;margin:-4px 0 8px;font-weight:500}
   .note{font-size:13px;color:#56605b;text-align:center;margin:12px 0 0}
+  .hint{background:#fff;border-radius:8px;padding:10px 12px;font-size:14px;margin:-4px 0 12px}
+  .link.inl{display:inline;margin:0;padding:0}
   .link{display:block;margin:8px auto 0;background:none;border:0;color:var(--green);font:inherit;font-weight:600;font-size:14px;
     text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 
@@ -120,10 +122,10 @@
     <input type="text" id="name" autocomplete="name" maxlength="60" placeholder="Nguyễn Thị A">
     <label for="phone">Số điện thoại</label>
     <input type="tel" id="phone" inputmode="numeric" autocomplete="tel" maxlength="20" placeholder="09xx xxx xxx">
+    <div class="hint" id="hint" hidden>Số điện thoại này đã tham gia chương trình. <button class="link inl" id="again" type="button">Xem mã quà tặng</button></div>
     <div class="err" id="err"></div>
     <button class="btn" id="spin" type="submit">Quay ngay</button>
     <p class="note">Mỗi số điện thoại được quay 1 lần.</p>
-    <button class="link" id="mine" type="button" hidden>Xem lại quà của tôi</button>
   </form>
 
   <section class="rules">
@@ -293,12 +295,27 @@ function normPhone(v){
 
 /* ---------- Backend ---------- */
 const DEMO = !API_URL || new URLSearchParams(location.search).has("demo"); // thêm ?demo vào link để thử giao diện, không ghi vào Sheet
-async function play(name, phone){
-  if(!DEMO){
-    const res = await fetch(API_URL,{method:"POST",body:JSON.stringify({name,phone})}); // text/plain => không preflight CORS
-    return res.json();
+async function api(body){
+  const res = await fetch(API_URL,{method:"POST",body:JSON.stringify(body)}); // text/plain => không preflight CORS
+  return res.json();
+}
+async function play(name, phone){ return DEMO ? playLocal(name, phone) : api({name, phone}); }
+
+// Tra cứu SĐT đã tham gia chưa (không ghi gì). Kết quả được nhớ lại để không hỏi máy chủ nhiều lần.
+const checked = new Map();   // phone -> Promise<kết quả>
+const played  = new Map();   // phone -> kết quả đã quay
+function checkPhone(phone){
+  if(!checked.has(phone)){
+    const p = (DEMO ? Promise.resolve(checkLocal(phone)) : api({action:"check", phone}))
+      .then(r=>{ if(r.status==="played") played.set(phone, r); return r; })
+      .catch(()=>{ checked.delete(phone); return {status:"unknown"}; });
+    checked.set(phone, p);
   }
-  return playLocal(name, phone);
+  return checked.get(phone);
+}
+function checkLocal(phone){
+  const old = JSON.parse(localStorage.getItem("ts_lucky")||"[]").find(r=>r.phone===phone);
+  return old ? {status:"played", prizeId:old.prizeId, prize:old.prize, code:old.code, time:old.time} : {status:"new"};
 }
 // Chế độ thử: cùng logic với Apps Script nhưng lưu localStorage
 function playLocal(name, phone){
@@ -330,11 +347,13 @@ $("form").addEventListener("submit", async e=>{
   const err = m=>{$("err").textContent=m;};
   if(name.length<2) return err("Vui lòng nhập họ và tên.");
   if(!phone) return err("Số điện thoại chưa đúng (10 số, bắt đầu bằng 0).");
+  if(played.has(phone)){ err(""); $("hint").hidden = false; return showResult(played.get(phone), true); } // đã tham gia: không quay nữa
   audioOn();
   err(""); busy = true; $("spin").disabled = true; $("spin").textContent = "Đang quay…";
   document.activeElement.blur();
   canvas.scrollIntoView({behavior:"smooth", block:"center"});     // về vòng quay ngay, không chờ máy chủ
   const r = await spinWheel(play(name, phone));
+  if(r.status==="ok" || r.status==="played"){ played.set(phone, r); $("hint").hidden = r.status!=="played"; }
   if(r.status==="ok"){ showResult(r,false); confetti(); winSound(); }
   else if(r.status==="played"){ showResult(r,true); }
   else if(r.status==="soldout"){ err("Chương trình đã hết quà. Cảm ơn bạn đã quan tâm!"); }
@@ -344,23 +363,27 @@ $("form").addEventListener("submit", async e=>{
   busy = false; $("spin").disabled = false; $("spin").textContent = "Quay ngay";
 });
 
-function showResult(r, played){
-  $("mTitle").textContent = played ? "Quà của bạn" : "Chúc mừng bạn!";
-  $("mLead").textContent  = played ? "Số điện thoại này đã quay và nhận được" : "Bạn đã nhận được";
+function showResult(r, isPlayed){
+  $("mTitle").textContent = isPlayed ? "Bạn đã tham gia chương trình" : "Chúc mừng bạn!";
+  $("mLead").textContent  = isPlayed ? "Đây là quà và mã quà tặng của bạn" : "Bạn đã nhận được";
   $("mVc").style.display = /voucher/i.test(r.prize) ? "" : "none";
-  try{ localStorage.setItem("ts_lucky_me", JSON.stringify(r)); }catch(e){}
-  $("mine").hidden = false;
   $("mImg").src = `assets/p${r.prizeId}.webp`;
   $("mPrize").textContent = r.prize;
   $("mCode").textContent = r.code;
-  $("mInfo").textContent = (played && r.time) ? "Thời gian quay: "+r.time : "";
+  $("mInfo").textContent = (isPlayed && r.time) ? "Thời gian quay: "+r.time : "";
   $("modal").classList.add("on");
 }
 $("next").addEventListener("click", ()=>{ $("modal").classList.remove("on"); });
-// Khách mở lại trang trên cùng điện thoại: hiện lại quà đã quay
-function myGift(){ try{ return JSON.parse(localStorage.getItem("ts_lucky_me")); }catch(e){ return null; } }
-$("mine").addEventListener("click", ()=>{ const r=myGift(); if(r) showResult(r,true); });
-if(myGift()){ $("mine").hidden=false; showResult(myGift(),true); }
+// Khi nhập xong SĐT hợp lệ: tra xem số này đã tham gia chưa; nếu rồi thì báo và hiện lại mã quà tặng.
+$("phone").addEventListener("input", async ()=>{
+  $("hint").hidden = true;
+  const phone = normPhone($("phone").value);
+  if(!phone) return;
+  const r = await checkPhone(phone);
+  if(r.status==="played" && normPhone($("phone").value)===phone && !busy){ $("err").textContent = ""; $("hint").hidden = false; showResult(r, true); }
+});
+$("again").addEventListener("click", ()=>{ const r = played.get(normPhone($("phone").value)); if(r) showResult(r, true); });
+try{ localStorage.removeItem("ts_lucky_me"); }catch(e){}   // bản cũ từng lưu quà trên máy; nay chỉ tra theo SĐT
 
 /* ---------- Pháo giấy ---------- */
 function confetti(){
