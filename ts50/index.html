@@ -88,6 +88,10 @@
   .step .n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--pink);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center}
   .step svg.ic,.step img{width:clamp(34px,10vw,46px);height:clamp(34px,10vw,46px);object-fit:contain}
   .arrow{align-self:center;color:var(--pink);font-size:22px;font-weight:700;margin-top:-30px}
+  .mine{text-align:center;margin:6px 0 8px}
+  .mine-t{margin:0 0 6px;font-size:clamp(22px,6.5vw,30px);font-weight:800;color:var(--green)}
+  body.locked .reg,body.locked .wheelsec,body.locked .div{display:none}
+  .mine[hidden]{display:none}
   .rule-note{margin:20px 0 0;padding:10px 14px;background:var(--pink-l);border-radius:12px;font-size:clamp(12.5px,3.5vw,14px);line-height:1.5;color:#2f3834;text-align:center}
   .rule-note b{color:var(--pink)}
   .info{margin-top:26px;border-top:1.5px solid var(--line);padding-top:18px;display:grid;grid-template-columns:repeat(3,1fr)}
@@ -141,7 +145,13 @@
 
   <div class="div"><img src="assets/gift-g.webp" alt=""></div>
 
-  <section>
+  <section class="mine" id="mine" hidden>
+    <p class="mine-t">Bạn đã tham gia chương trình</p>
+    <p class="h-sub">Mỗi thiết bị chỉ quay 1 lần. Xem lại mã quà tặng và mang đến cửa hàng để nhận quà.</p>
+    <button class="btn" id="mineBtn" type="button" style="margin-top:14px">Xem mã quà tặng của tôi</button>
+  </section>
+
+  <section class="reg">
     <h2 class="himg"><img src="assets/h-reg.webp" alt="Đăng ký thành viên ngay"></h2>
     <p class="h-sub">Nhận nhiều ưu đãi đặc biệt và quà tặng tại cửa hàng!</p>
     <div class="perks">
@@ -166,7 +176,7 @@
 
   <div class="div"><img src="assets/wheel-g.webp" alt=""></div>
 
-  <section>
+  <section class="wheelsec">
     <h2 class="himg wheel"><img src="assets/h-wheel.webp" alt="Vòng quay may mắn"></h2>
     <p class="h-sub">Đăng ký thành viên – Quay là có quà!</p>
     <div class="stage">
@@ -436,7 +446,7 @@ $("form").addEventListener("submit", async e=>{
   document.activeElement.blur();
   canvas.scrollIntoView({behavior:"smooth", block:"center"});     // về vòng quay ngay, không chờ máy chủ
   const r = await spinWheel(play(name, phone));
-  if(r.status==="ok" || r.status==="played"){ played.set(phone, r); $("hint").hidden = r.status!=="played"; }
+  if(r.status==="ok" || r.status==="played"){ played.set(phone, r); $("hint").hidden = r.status!=="played"; saveMine(r); }
   if(r.status==="ok"){ showResult(r,false); confetti(); winSound(); }
   else if(r.status==="played"){ showResult(r,true); }
   else if(r.status==="soldout"){ err("Chương trình đã hết quà. Cảm ơn bạn đã quan tâm!"); }
@@ -477,7 +487,23 @@ $("review").addEventListener("click", async ()=>{
   else $("err").textContent = "Không kiểm tra được, vui lòng thử lại.";
 });
 $("again").addEventListener("click", ()=>{ const r = played.get(normPhone($("phone").value)); if(r) showResult(r, true); });
-try{ localStorage.removeItem("ts_lucky_me"); }catch(e){}   // bản cũ từng lưu quà trên máy; nay chỉ tra theo SĐT
+// Khoá theo thiết bị: quay xong thì lần mở sau chỉ hiện kết quả, không còn giao diện quay.
+// (Máy chủ vẫn chặn theo SĐT. Thêm ?unlock vào địa chỉ để mở khoá máy này khi test.)
+const LOCK_KEY = "ts_lucky_me";
+function saveMine(r){ try{ localStorage.setItem(LOCK_KEY, JSON.stringify({prizeId:r.prizeId, prize:r.prize, code:r.code, time:r.time||""})); }catch(e){} }
+(function(){
+  let mine = null;
+  try{
+    if(new URLSearchParams(location.search).has("unlock")) localStorage.removeItem(LOCK_KEY);
+    mine = JSON.parse(localStorage.getItem(LOCK_KEY) || "null");
+  }catch(e){}
+  if(mine && mine.code){
+    document.body.classList.add("locked"); $("mine").hidden = false;
+    const open = ()=>showResult(Object.assign({status:"played"}, mine), true);
+    $("mineBtn").addEventListener("click", open);
+    open();
+  }
+})();
 
 /* ---------- Pháo giấy ---------- */
 function confetti(){
